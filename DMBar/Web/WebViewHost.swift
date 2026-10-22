@@ -44,12 +44,20 @@ final class WebViewHost: NSObject, WKNavigationDelegate, WKUIDelegate, WKScriptM
                       let png = NSBitmapImageRep(data: tiff)?.representation(using: .png, properties: [:]) else { return }
                 try? png.write(to: FileManager.default.temporaryDirectory.appendingPathComponent("dmbar.png"))
             }
+            self?.domOutline { text in
+                try? text.write(to: FileManager.default.temporaryDirectory.appendingPathComponent("dom.txt"), atomically: true, encoding: .utf8)
+            }
         }
         #endif
         webView.navigationDelegate = self
         webView.uiDelegate = self
         park()
-        webView.load(URLRequest(url: Self.inboxURL))
+        var start = Self.inboxURL
+        #if DEBUG
+        // Permite reabrir direto numa conversa ao testar CSS: DMBAR_URL=https://www.instagram.com/direct/t/...
+        if let env = ProcessInfo.processInfo.environment["DMBAR_URL"], let url = URL(string: env) { start = url }
+        #endif
+        webView.load(URLRequest(url: start))
     }
 
     /// Devolve a view para a janela oculta.
@@ -60,8 +68,15 @@ final class WebViewHost: NSObject, WKNavigationDelegate, WKUIDelegate, WKScriptM
     }
 
     #if DEBUG
-    /// Copia um esboço da árvore do DOM (tag, role, aria-label) para achar seletores do CSS da etapa c.
     func copyDOMOutline() {
+        domOutline { text in
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.setString(text, forType: .string)
+        }
+    }
+
+    /// Esboço da árvore do DOM (tag, role, aria-label, tamanho e y) para achar seletores do CSS.
+    func domOutline(_ completion: @escaping (String) -> Void) {
         let js = """
         (function walk(el, d) {
           if (d > 40 || !el.children) return '';
@@ -73,16 +88,14 @@ final class WebViewHost: NSObject, WKNavigationDelegate, WKUIDelegate, WKScriptM
             const r = c.getAttribute('role'), a = c.getAttribute('aria-label'), h = c.getAttribute('href');
             out += ' '.repeat(d) + c.tagName.toLowerCase() + (r ? '[role=' + r + ']' : '') +
               (a ? '[aria-label=' + a + ']' : '') + (h ? '[href=' + h + ']' : '') +
-              ' ' + Math.round(c.getBoundingClientRect().width) + 'x' + Math.round(c.getBoundingClientRect().height) + '\\n';
+              ' ' + Math.round(box.width) + 'x' + Math.round(box.height) + ' y' + Math.round(box.top) + '\\n';
             out += walk(c, d + 1);
           }
           return out;
-        })(document.body, 0)
+        })(document.body, 0) + location.href
         """
         webView.evaluateJavaScript(js) { result, _ in
-            guard let text = result as? String else { return }
-            NSPasteboard.general.clearContents()
-            NSPasteboard.general.setString(text, forType: .string)
+            if let text = result as? String { completion(text) }
         }
     }
     #endif

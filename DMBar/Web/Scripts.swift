@@ -16,17 +16,27 @@ enum Scripts {
         width: 100% !important; max-width: none !important; flex: 1 1 auto !important; border: 0 !important;
     }
     html[data-dmbar="thread"] main div:has(> div[role="navigation"]) > div[role="navigation"] { display: none !important; }
-    html[data-dmbar="thread"] main div:has(> div[role="navigation"]) > :not([role="navigation"]) { width: 100% !important; max-width: none !important; flex: 1 1 auto !important; }
+    /* height: a conversa também descontava os 50px da barra, o que sobrava vazio abaixo do campo de mensagem. */
+    html[data-dmbar="thread"] main div:has(> div[role="navigation"]) > :not([role="navigation"]) { width: 100% !important; max-width: none !important; flex: 1 1 auto !important; height: 100% !important; }
+    /* Lista, pedidos e conversa têm altura própria (100vh - 50px), não herdada: precisa do caminho exato. */
+    main > section > div > div > div > div { height: 100vh !important; max-height: none !important; }
+    main div[role="navigation"], main div[role="navigation"] > div { height: 100% !important; max-height: none !important; }
+    /* Cabeçalho da conversa (foto, nome, ligar, vídeo, info). */
+    html[data-dmbar="thread"] main div:has(> div > div > div > a[role="link"] h2) { display: none !important; }
+
+    /* Cabeçalho da lista (nome da conta e botão de nova mensagem) e a faixa de Notas. */
+    main div[role="navigation"] > div > div:has(> div[role="button"] h2) { display: none !important; }
+    main div[role="navigation"] div:has(> div > div[role="presentation"]) { display: none !important; }
 
     /* Barra de rolagem da página ocupava 17px à direita; o scroll por trackpad continua. */
     ::-webkit-scrollbar { width: 0 !important; height: 0 !important; }
 
     #dmbar-back { display: none; }
     html[data-dmbar="thread"] #dmbar-back {
-        /* Cabe na margem de ~20px à esquerda do avatar do cabeçalho da conversa. */
-        display: block; position: fixed; top: 22px; left: 2px; z-index: 99999;
-        width: 18px; height: 32px; padding: 0; border: 0;
-        background: none; color: inherit; font-size: 26px; line-height: 26px; cursor: pointer;
+        /* Sem o cabeçalho da conversa, flutua sobre as mensagens: o fundo garante leitura. */
+        display: block; position: fixed; top: 8px; left: 8px; z-index: 99999;
+        width: 28px; height: 28px; padding: 0 0 3px; border: 0; border-radius: 14px;
+        background: rgba(128,128,128,.35); color: inherit; font-size: 22px; line-height: 22px; cursor: pointer;
     }
     """
 

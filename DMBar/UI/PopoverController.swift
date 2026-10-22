@@ -15,6 +15,12 @@ final class PopoverController: NSViewController {
         view.addSubview(webView)
     }
 
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        // Abrir pelo teclado (Option+D) faz o WebKit mostrar o anel de foco no último elemento focado, como a aba Primary.
+        WebViewHost.shared.webView.evaluateJavaScript("document.activeElement?.blur()")
+    }
+
     override func viewDidDisappear() {
         super.viewDidDisappear()
         WebViewHost.shared.park()
