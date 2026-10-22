@@ -27,13 +27,42 @@ enum Scripts {
     /* Cabeçalho da lista (nome da conta e botão de nova mensagem) e a faixa de Notas. */
     main div[role="navigation"] > div > div:has(> div[role="button"] h2) { display: none !important; }
     main div[role="navigation"] div:has(> div > div[role="presentation"]) { display: none !important; }
+    /* Cabeçalho de Pedidos de contato (seta do Instagram e título): a seta do DMBar substitui. */
+    main div[role="navigation"] > div > div:has(> div > div[role="button"]):has(> span) { display: none !important; }
+    /* Faixa para a seta não cobrir o primeiro item dos Pedidos. */
+    html[data-dmbar-back] main div[role="navigation"] > div { padding-top: 44px !important; box-sizing: border-box !important; }
+
+    /* Sem fundo de hover nas conversas. Vale só para div: o ponto verde de online é span e mantém a cor. */
+    main div[role="navigation"] div:hover { background-color: transparent !important; }
+
+    /* Post ou reel aberto de uma DM: o modal limita o conteúdo a ~150px e o nome quebra letra por letra. */
+    div[role="dialog"] > div > div,
+    div[role="dialog"] > div > div > div,
+    div[role="dialog"] article,
+    div[role="dialog"] article > div { width: 100% !important; max-width: none !important; }
+    /* Cabeçalho e ações na largura toda; a mídia ocupa o espaço que sobra e o vídeo mantém a proporção. */
+    div[role="dialog"] article > div { display: flex !important; flex-direction: column !important; }
+    div[role="dialog"] article > div > div:first-child,
+    div[role="dialog"] article > div > div:last-child { width: 100% !important; height: auto !important; flex: none !important; }
+    /* Só o bloco da mídia: forçar tamanho nos divs internos esticava também os controles de volume. */
+    div[role="dialog"] article > div > div:nth-child(2) { width: 100% !important; max-width: none !important; }
+    /* Modal colado no topo e no fim do popover, sem a faixa vazia em cima e embaixo. */
+    div[role="dialog"] { height: 100vh !important; max-height: none !important; margin: 0 !important; }
+    div[role="dialog"] div:has(article), div[role="dialog"] article, div[role="dialog"] article > div { height: 100% !important; max-height: none !important; }
+    /* Menu "..." do post sai: o X de fechar do Instagram fica no lugar dele, no canto do cabeçalho. */
+    div[role="dialog"] header + div { visibility: hidden !important; }
+    /* A mídia ocupa o que sobra entre cabeçalho e ações. Antes ficava em 262px e o vídeo vazava por baixo das ações. */
+    div[role="dialog"] article > div > div:nth-child(2) { flex: 1 1 0 !important; min-height: 0 !important; height: auto !important; max-height: none !important; overflow: hidden !important; }
+    /* Só os divs que contêm o vídeo: o Instagram usa padding de proporção neles; os controles ficam de fora. */
+    div[role="dialog"] article > div > div:nth-child(2) div:has(video) { height: 100% !important; padding: 0 !important; }
+    div[role="dialog"] article > div > div:nth-child(2) video { width: 100% !important; height: 100% !important; object-fit: contain !important; }
 
     /* Barra de rolagem da página ocupava 17px à direita; o scroll por trackpad continua. */
     ::-webkit-scrollbar { width: 0 !important; height: 0 !important; }
 
     #dmbar-back { display: none; }
-    html[data-dmbar="thread"] #dmbar-back {
-        /* Sem o cabeçalho da conversa, flutua sobre as mensagens: o fundo garante leitura. */
+    html[data-dmbar-back] #dmbar-back {
+        /* Sem os cabeçalhos, flutua sobre o conteúdo: o fundo garante leitura. */
         display: block; position: fixed; top: 8px; left: 8px; z-index: 99999;
         width: 28px; height: 28px; padding: 0 0 3px; border: 0; border-radius: 14px;
         background: rgba(128,128,128,.35); color: inherit; font-size: 22px; line-height: 22px; cursor: pointer;
@@ -50,12 +79,20 @@ enum Scripts {
       function update() {
         const mode = location.pathname.startsWith('/direct/t/') ? 'thread' : 'inbox';
         if (document.documentElement.dataset.dmbar !== mode) document.documentElement.dataset.dmbar = mode;
+        // Seta de voltar em telas abaixo da inbox: conversa e Pedidos de contato.
+        const sub = mode === 'thread' || location.pathname.startsWith('/direct/requests');
+        document.documentElement.toggleAttribute('data-dmbar-back', sub);
         if (document.body && !document.getElementById('dmbar-back')) {
           const back = document.createElement('button');
           back.id = 'dmbar-back';
           back.textContent = '‹';
           back.setAttribute('aria-label', 'Voltar para a lista');
-          back.onclick = () => history.length > 1 ? history.back() : location.assign('/direct/inbox/');
+          // Vai sempre para a inbox: history.back() falhava depois de abrir um vídeo da conversa.
+          // O link da barra escondida navega sem recarregar a página; sem ele, recarrega.
+          back.onclick = () => {
+            const link = document.querySelector('a[href="/direct/inbox/"]');
+            link ? link.click() : location.assign('/direct/inbox/');
+          };
           document.body.appendChild(back);
         }
         // Três fontes, porque nenhuma cobre tudo: título "(3) ...", badge no ícone de DMs da barra

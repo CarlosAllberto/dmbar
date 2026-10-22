@@ -57,7 +57,27 @@ final class WebViewHost: NSObject, WKNavigationDelegate, WKUIDelegate, WKScriptM
         // Permite reabrir direto numa conversa ao testar CSS: DMBAR_URL=https://www.instagram.com/direct/t/...
         if let env = ProcessInfo.processInfo.environment["DMBAR_URL"], let url = URL(string: env) { start = url }
         #endif
-        webView.load(URLRequest(url: start))
+        Self.allowThirdPartyCookies(in: config.websiteDataStore) { [weak self] in
+            self?.webView.load(URLRequest(url: start))
+        }
+    }
+
+    /// "Entrar com Facebook" depende de o instagram.com ler o cookie do facebook.com (ig_xsite_user_info).
+    /// O WebKit bloqueia cookies de terceiros por padrão, como o "Impedir rastreamento entre sites" do Safari.
+    /// Vale só para o armazenamento do DMBar; Safari e outros apps não mudam.
+    /// shortcut: usa SPI do WebKit (não é API do Instagram); se a Apple remover, o login por Facebook volta a falhar e o resto segue igual.
+    private static func allowThirdPartyCookies(in store: WKWebsiteDataStore, then done: @escaping () -> Void) {
+        let statsSelector = NSSelectorFromString("_setResourceLoadStatisticsEnabled:")
+        if store.responds(to: statsSelector) {
+            typealias SetBool = @convention(c) (AnyObject, Selector, Bool) -> Void
+            unsafeBitCast(store.method(for: statsSelector), to: SetBool.self)(store, statsSelector, false)
+        }
+        let cookieSelector = NSSelectorFromString("_setThirdPartyCookieBlockingMode:onlyOnSitesWithoutUserInteraction:completionHandler:")
+        guard store.responds(to: cookieSelector) else { return done() }
+        typealias SetMode = @convention(c) (AnyObject, Selector, Bool, Bool, @escaping @convention(block) () -> Void) -> Void
+        unsafeBitCast(store.method(for: cookieSelector), to: SetMode.self)(store, cookieSelector, false, false) {
+            DispatchQueue.main.async(execute: done)
+        }
     }
 
     /// Devolve a view para a janela oculta.
@@ -99,6 +119,18 @@ final class WebViewHost: NSObject, WKNavigationDelegate, WKUIDelegate, WKScriptM
         }
     }
     #endif
+
+    /// Apaga cookies e dados do site; é isso que mantém a sessão, não há logout no lado do app.
+    func logout() {
+        let store = webView.configuration.websiteDataStore
+        store.fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
+            store.removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), for: records) { [weak self] in
+                self?.unreadCount = 0
+                self?.onUnreadChange?(0)
+                self?.webView.load(URLRequest(url: Self.inboxURL))
+            }
+        }
+    }
 
     func reload() {
         if webView.url == nil {

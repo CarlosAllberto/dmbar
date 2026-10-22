@@ -69,6 +69,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(withTitle: "Debug: copiar DOM", action: #selector(copyDOM), keyEquivalent: "").target = self
         #endif
         menu.addItem(.separator())
+        menu.addItem(withTitle: "Sair da conta…", action: #selector(logout), keyEquivalent: "").target = self
         menu.addItem(withTitle: "Sair", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         // Atribuir o menu só durante o clique evita que o botão passe a ignorar o left click.
         statusItem.menu = menu
@@ -85,6 +86,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         WebViewHost.shared.copyDOMOutline()
     }
     #endif
+
+    @objc private func logout() {
+        let alert = NSAlert()
+        alert.messageText = "Sair da conta do Instagram?"
+        alert.informativeText = "O DMBar apaga a sessão salva. Para voltar, você entra de novo com usuário e senha."
+        alert.addButton(withTitle: "Sair da conta")
+        alert.addButton(withTitle: "Cancelar")
+        NSApp.activate(ignoringOtherApps: true)
+        if alert.runModal() == .alertFirstButtonReturn {
+            WebViewHost.shared.logout()
+        }
+    }
 
     @objc private func showPreferences() {
         if preferences == nil { preferences = PreferencesWindow() }
