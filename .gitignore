@@ -1,0 +1,4 @@
+build/
+DMBar.xcodeproj/
+.DS_Store
+xcuserdata/

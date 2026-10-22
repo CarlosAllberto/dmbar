@@ -1,0 +1,93 @@
+import AppKit
+
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    private var statusItem: NSStatusItem!
+    private let popover = NSPopover()
+    private var preferences: PreferencesWindow?
+    private let notifications = NotificationService()
+    private var lastUnread = 0
+    private var hotKey: HotKeyService?
+
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        popover.contentSize = NSSize(width: 380, height: 560)
+        // transient fecha ao clicar fora; trocar por .applicationDefined se atrapalhar o chat
+        popover.behavior = .transient
+        popover.contentViewController = PopoverController()
+        _ = WebViewHost.shared  // carrega a página já na abertura, para receber mensagens em segundo plano
+
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        if let button = statusItem.button {
+            button.image = NSImage(systemSymbolName: "bubble.left.fill", accessibilityDescription: "DMBar")
+            button.target = self
+            button.action = #selector(statusItemClicked)
+            button.sendAction(on: [.leftMouseUp, .rightMouseUp])
+            button.imagePosition = .imageLeading
+        }
+        hotKey = HotKeyService { [weak self] in self?.togglePopover() }
+        notifications.requestPermission()
+        notifications.onOpen = { [weak self] in self?.showPopover() }
+        WebViewHost.shared.onUnreadChange = { [weak self] count in
+            guard let self else { return }
+            statusItem.button?.title = count > 0 ? " \(count)" : ""
+            // Só avisa quando o contador sobe e o usuário não está olhando as DMs.
+            if count > lastUnread && !popover.isShown {
+                notifications.notifyUnread(count)
+            } else if count == 0 {
+                notifications.clear()
+            }
+            lastUnread = count
+        }
+    }
+
+    @objc private func statusItemClicked() {
+        if NSApp.currentEvent?.type == .rightMouseUp {
+            showMenu()
+        } else {
+            togglePopover()
+        }
+    }
+
+    private func togglePopover() {
+        guard let button = statusItem.button else { return }
+        if popover.isShown {
+            popover.performClose(nil)
+        } else {
+            popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+            NSApp.activate(ignoringOtherApps: true)
+        }
+    }
+
+    private func showPopover() {
+        if !popover.isShown { togglePopover() }
+    }
+
+    private func showMenu() {
+        let menu = NSMenu()
+        menu.addItem(withTitle: "Atualizar", action: #selector(reload), keyEquivalent: "").target = self
+        menu.addItem(withTitle: "Preferências…", action: #selector(showPreferences), keyEquivalent: ",").target = self
+        #if DEBUG
+        menu.addItem(withTitle: "Debug: copiar DOM", action: #selector(copyDOM), keyEquivalent: "").target = self
+        #endif
+        menu.addItem(.separator())
+        menu.addItem(withTitle: "Sair", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        // Atribuir o menu só durante o clique evita que o botão passe a ignorar o left click.
+        statusItem.menu = menu
+        statusItem.button?.performClick(nil)
+        statusItem.menu = nil
+    }
+
+    @objc private func reload() {
+        WebViewHost.shared.reload()
+    }
+
+    #if DEBUG
+    @objc private func copyDOM() {
+        WebViewHost.shared.copyDOMOutline()
+    }
+    #endif
+
+    @objc private func showPreferences() {
+        if preferences == nil { preferences = PreferencesWindow() }
+        preferences?.show()
+    }
+}

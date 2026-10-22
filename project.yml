@@ -1,0 +1,28 @@
+name: DMBar
+options:
+  bundleIdPrefix: com.treendz
+  deploymentTarget:
+    macOS: "13.0"
+targets:
+  DMBar:
+    type: application
+    platform: macOS
+    sources: [DMBar]
+    info:
+      path: DMBar/Info.plist
+      properties:
+        CFBundleName: DMBar
+        LSUIElement: true
+        LSMinimumSystemVersion: "13.0"
+    entitlements:
+      path: DMBar/DMBar.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.network.client: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.treendz.dmbar
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+        SWIFT_VERSION: "5.9"
+        ENABLE_HARDENED_RUNTIME: true
