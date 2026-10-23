@@ -9,6 +9,7 @@
 ![macOS 13+](https://img.shields.io/badge/macOS-13%2B-black)
 ![Swift 5.9](https://img.shields.io/badge/Swift-5.9-orange)
 ![Sem dependências](https://img.shields.io/badge/depend%C3%AAncias-nenhuma-lightgrey)
+![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-blue)
 
 [Recursos](#recursos) • [Instalação](#instalação) • [Uso](#uso) • [Como funciona](#como-funciona) • [Limitações](#limitações)
 
@@ -19,9 +20,9 @@ DMBar é um app nativo de barra de menu que mostra só as mensagens diretas do I
 O app carrega a versão web oficial do Instagram num `WKWebView`. Ele não usa API privada do Instagram nem automatiza requisições.
 
 <p align="center">
-  <img src="docs/screenshots/inbox.webp" alt="Lista de conversas no popover do DMBar" width="32%">
-  <img src="docs/screenshots/conversa.webp" alt="Conversa aberta no DMBar" width="32%">
-  <img src="docs/screenshots/pedidos.webp" alt="Pedidos de contato no DMBar" width="32%">
+  <img src="docs/screenshots/inbox.png" alt="Lista de conversas no popover do DMBar" width="32%">
+  <img src="docs/screenshots/conversa.png" alt="Conversa aberta no DMBar" width="32%">
+  <img src="docs/screenshots/pedidos.png" alt="Pedidos de contato no DMBar" width="32%">
 </p>
 
 > [!NOTE]
@@ -39,7 +40,24 @@ O app carrega a versão web oficial do Instagram num `WKWebView`. Ele não usa A
 
 ## Instalação
 
-### Requisitos
+### Baixar a versão pronta
+
+1. Baixe o `DMBar.zip` da [última release](https://github.com/CarlosAllberto/dmbar/releases/latest).
+2. Descompacte e mova o `DMBar.app` para `/Applications`.
+3. Abra o app.
+
+> [!WARNING]
+> O app não é notarizado pela Apple, então o macOS bloqueia a primeira abertura. Para liberar, vá em **Ajustes do Sistema > Privacidade e Segurança** e clique em **Abrir Mesmo Assim**. Outra opção é remover a quarentena pelo terminal:
+>
+> ```bash
+> xattr -dr com.apple.quarantine /Applications/DMBar.app
+> ```
+
+As releases são compiladas pelo GitHub Actions a cada tag `v*`, a partir deste repositório.
+
+### Compilar a partir do código
+
+Requisitos:
 
 - macOS 13 ou superior
 - Xcode 15 ou superior
@@ -48,8 +66,6 @@ O app carrega a versão web oficial do Instagram num `WKWebView`. Ele não usa A
 ```bash
 brew install xcodegen
 ```
-
-### Compilar
 
 O projeto Xcode é gerado a partir do [`project.yml`](project.yml) e não fica no repositório.
 
@@ -115,7 +131,7 @@ O build Debug tem ferramentas para ajustar o CSS:
 - **Captura e DOM:** a cada 3 segundos, o app salva `dmbar.png` e `dom.txt` em `~/Library/Containers/com.treendz.dmbar/Data/tmp/`.
 - **Copiar DOM:** o menu do ícone ganha **Debug: copiar DOM**.
 - **Abrir numa página:** a variável `DMBAR_URL` define a página inicial.
-- **Modo demo:** com `DMBAR_DEMO=1`, nomes, mensagens e fotos viram dados fictícios, com retratos do Unsplash. Foi assim que as imagens deste README foram feitas.
+- **Modo demo:** com `DMBAR_DEMO=1`, nomes, mensagens e fotos viram dados fictícios, com retratos do Unsplash. Foi assim que as imagens deste README foram feitas. As fotos seguem a [licença Unsplash](https://unsplash.com/license), não a licença MIT do projeto.
 
 ```bash
 DMBAR_URL=https://www.instagram.com/direct/requests/ build/Build/Products/Debug/DMBar.app/Contents/MacOS/DMBar

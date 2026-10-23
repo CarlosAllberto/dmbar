@@ -32,6 +32,9 @@ final class WebViewHost: NSObject, WKNavigationDelegate, WKUIDelegate, WKScriptM
         hiddenWindow.ignoresMouseEvents = true
         hiddenWindow.alphaValue = 0
         hiddenWindow.setFrameOrigin(NSPoint(x: -10000, y: -10000))
+        // Janela invisível não pode contar como janela do app: sem isso, o Mission Control e o
+        // Organizador Visual mostravam a mesa vazia com o DMBar "na frente".
+        hiddenWindow.collectionBehavior = [.auxiliary, .transient, .ignoresCycle]
 
         super.init()
         config.userContentController.add(self, name: "unread")
