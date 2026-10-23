@@ -1,6 +1,6 @@
 import AppKit
 
-final class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private var statusItem: NSStatusItem!
     private let popover = NSPopover()
     private var preferences: PreferencesWindow?
@@ -13,6 +13,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // transient fecha ao clicar fora; trocar por .applicationDefined se atrapalhar o chat
         popover.behavior = .transient
         popover.contentViewController = PopoverController()
+        popover.delegate = self
         _ = WebViewHost.shared  // carrega a página já na abertura, para receber mensagens em segundo plano
 
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -28,7 +29,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         notifications.onOpen = { [weak self] in self?.showPopover() }
         WebViewHost.shared.onUnreadChange = { [weak self] count in
             guard let self else { return }
-            statusItem.button?.title = count > 0 ? " \(count)" : ""
+            // O número muda a largura do ícone, e o popover aberto não acompanha: só atualiza com ele fechado.
+            if !popover.isShown { updateBadge() }
             // Só avisa quando o contador sobe e o usuário não está olhando as DMs.
             if count > lastUnread && !popover.isShown {
                 notifications.notifyUnread(count)
@@ -55,6 +57,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
             NSApp.activate(ignoringOtherApps: true)
         }
+    }
+
+    private func updateBadge() {
+        let count = WebViewHost.shared.unreadCount
+        statusItem.button?.title = count > 0 ? " \(count)" : ""
+    }
+
+    func popoverDidClose(_ notification: Notification) {
+        updateBadge()
     }
 
     private func showPopover() {
