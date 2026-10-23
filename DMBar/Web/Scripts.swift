@@ -77,6 +77,8 @@ enum Scripts {
 
       // Instagram é SPA: a URL muda sem recarregar, então o modo é conferido em loop.
       function update() {
+        // Depois do login o Instagram cai no feed ("/"); o DMBar só mostra DMs.
+        if (location.pathname === '/') { location.replace('/direct/inbox/'); return; }
         const mode = location.pathname.startsWith('/direct/t/') ? 'thread' : 'inbox';
         if (document.documentElement.dataset.dmbar !== mode) document.documentElement.dataset.dmbar = mode;
         // Seta de voltar em telas abaixo da inbox: conversa e Pedidos de contato.
