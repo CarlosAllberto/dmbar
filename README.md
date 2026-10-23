@@ -18,6 +18,12 @@ DMBar é um app nativo de barra de menu que mostra só as mensagens diretas do I
 
 O app carrega a versão web oficial do Instagram num `WKWebView`. Ele não usa API privada do Instagram nem automatiza requisições.
 
+<p align="center">
+  <img src="docs/screenshots/inbox.webp" alt="Lista de conversas no popover do DMBar" width="32%">
+  <img src="docs/screenshots/conversa.webp" alt="Conversa aberta no DMBar" width="32%">
+  <img src="docs/screenshots/pedidos.webp" alt="Pedidos de contato no DMBar" width="32%">
+</p>
+
 > [!NOTE]
 > DMBar é um projeto independente. Ele não tem relação com o Instagram nem com a Meta.
 
@@ -109,6 +115,7 @@ O build Debug tem ferramentas para ajustar o CSS:
 - **Captura e DOM:** a cada 3 segundos, o app salva `dmbar.png` e `dom.txt` em `~/Library/Containers/com.treendz.dmbar/Data/tmp/`.
 - **Copiar DOM:** o menu do ícone ganha **Debug: copiar DOM**.
 - **Abrir numa página:** a variável `DMBAR_URL` define a página inicial.
+- **Modo demo:** com `DMBAR_DEMO=1`, nomes, mensagens e fotos viram dados fictícios, com retratos do Unsplash. Foi assim que as imagens deste README foram feitas.
 
 ```bash
 DMBAR_URL=https://www.instagram.com/direct/requests/ build/Build/Products/Debug/DMBar.app/Contents/MacOS/DMBar

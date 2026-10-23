@@ -37,6 +37,9 @@ final class WebViewHost: NSObject, WKNavigationDelegate, WKUIDelegate, WKScriptM
         config.userContentController.add(self, name: "unread")
         #if DEBUG
         if #available(macOS 13.3, *) { webView.isInspectable = true }
+        if ProcessInfo.processInfo.environment["DMBAR_DEMO"] != nil {
+            config.userContentController.addUserScript(WKUserScript(source: Scripts.demoJS, injectionTime: .atDocumentEnd, forMainFrameOnly: true))
+        }
         // Foto da página a cada 3 s em tmp/dmbar.png, para ajustar o CSS sem abrir o popover.
         Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { [weak self] _ in
             self?.webView.takeSnapshot(with: nil) { image, _ in

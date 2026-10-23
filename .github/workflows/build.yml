@@ -1,0 +1,43 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write  # publicar a release quando o push for de uma tag v*
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar XcodeGen
+        run: brew install xcodegen
+
+      - name: Gerar projeto
+        run: xcodegen generate
+
+      - name: Compilar Release
+        run: |
+          xcodebuild -project DMBar.xcodeproj -scheme DMBar -configuration Release \
+            -derivedDataPath build build
+
+      # ditto preserva a assinatura ad-hoc e os atributos do .app; zip comum quebra o pacote.
+      - name: Compactar app
+        run: ditto -c -k --keepParent build/Build/Products/Release/DMBar.app DMBar.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DMBar
+          path: DMBar.zip
+
+      - name: Publicar release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" DMBar.zip --title "$GITHUB_REF_NAME" --generate-notes

@@ -116,8 +116,68 @@ enum Scripts {
     })();
     """
 
+    #if DEBUG
+    /// Modo demo para prints do README (DMBAR_DEMO=1): troca nomes, fotos e mensagens reais por dados fictícios.
+    /// O mesmo texto original vira sempre o mesmo texto falso, então o nome bate entre lista e conversa.
+    static let demoJS = """
+    (function () {
+      const names = ['Ana Ribeiro', 'Lucas Martins', 'Bia Costa', 'Rafa Souza', 'Duda Lima', 'Pedro Alves', 'Julia Rocha', 'Caio Nunes'];
+      const texts = ['Bora café amanhã?', 'Mandei o arquivo agora', 'Kkkk muito bom', 'Chego em 10 min', 'Valeu! 🙌',
+        'Viu o jogo ontem?', 'Fechado, combinado', 'Me liga quando puder', 'Que foto linda!', 'Tô saindo agora'];
+      const photos = \(jsonArray(DemoAvatars.dataURIs));
+      // Textos da interface do Instagram que ficam como estão.
+      const keep = /^(Primary|Principal|General|Geral|Pedidos|Requests?|Pesquisar|Search|Mensagem|Message|Ver perfil|View profile|Seguir|Follow|Delete all|Visto|Seen|Hoje|Today|Ontem|Yesterday|Você|You|·|\\s*)$|^(Pedidos|Requests?) \\(\\d+\\)$|^\\d+\\s*(s|min|h|d|sem|w)$|^(há|visto|seen|enviad|sent)|(\\.\\.\\.|…)$/i;
+      const map = new Map();
+      let n = 0, t = 0;
+      const fake = (orig, isName) => {
+        if (!map.has(orig)) map.set(orig, isName ? names[n++ % names.length] : texts[t++ % texts.length]);
+        return map.get(orig);
+      };
+      // A foto segue o nome falso mais próximo (linha da lista ou conversa), para nome e rosto baterem.
+      function photoFor(img, main) {
+        const scope = img.closest('div[role="button"]') || main;
+        const name = textNodes(scope).map(n => n.nodeValue).find(v => names.includes(v));
+        return photos[(name ? names.indexOf(name) : 0) % photos.length];
+      }
+      function textNodes(root) {
+        const out = [], walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        while (walker.nextNode()) if (walker.currentNode.nodeValue.trim()) out.push(walker.currentNode);
+        return out;
+      }
+      const faked = new WeakSet();
+      function swap(node, isName) {
+        if (faked.has(node) || keep.test(node.nodeValue.trim())) return;
+        node.nodeValue = fake(node.nodeValue.trim(), isName);
+        faked.add(node);
+      }
+      function run() {
+        const main = document.querySelector('main');
+        if (!main) return;
+        // Na lista, o primeiro texto de cada conversa é o nome.
+        main.querySelectorAll('div[role="navigation"] div[role="button"]').forEach(row => {
+          textNodes(row).forEach((node, i) => swap(node, i === 0));
+        });
+        // Nomes (h2, links de perfil) primeiro, para baterem com a lista; o resto vira mensagem.
+        main.querySelectorAll('h2, a[href^="/"] span').forEach(el => textNodes(el).forEach(node => swap(node, true)));
+        textNodes(main).forEach(node => swap(node, false));
+        // React volta o src real a cada render, então a troca é conferida em todo ciclo.
+        main.querySelectorAll('img').forEach(img => {
+          const photo = photoFor(img, main);
+          if (img.src !== photo) { img.removeAttribute('srcset'); img.src = photo; }
+        });
+        main.querySelectorAll('video').forEach(v => v.style.visibility = 'hidden');
+      }
+      setInterval(run, 300);
+    })();
+    """
+    #endif
+
     static var userScript: WKUserScript {
         WKUserScript(source: js, injectionTime: .atDocumentStart, forMainFrameOnly: true)
+    }
+
+    private static func jsonArray(_ items: [String]) -> String {
+        String(data: try! JSONSerialization.data(withJSONObject: items), encoding: .utf8)!
     }
 
     private static func jsonString(_ s: String) -> String {
