@@ -49,11 +49,7 @@ The app loads the official Instagram website in a `WKWebView`. It does not use a
 3. Open the app.
 
 > [!NOTE]
-> The app is not notarized by Apple yet, so macOS asks for confirmation the first time you open it. Go to **System Settings > Privacy & Security** and click **Open Anyway**. You can also remove the quarantine flag from the terminal:
->
-> ```bash
-> xattr -dr com.apple.quarantine /Applications/DMBar.app
-> ```
+> The app is not notarized by Apple yet, so macOS asks for confirmation the first time you open it. Go to **System Settings > Privacy & Security** and click **Open Anyway**.
 
 Releases are built by GitHub Actions from this repository for every `v*` tag.
 

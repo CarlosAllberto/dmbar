@@ -49,11 +49,7 @@ O app carrega a versão web oficial do Instagram num `WKWebView`. Ele não usa A
 3. Abra o app.
 
 > [!NOTE]
-> O app ainda não é notarizado pela Apple, então o macOS pede uma confirmação na primeira abertura. Para liberar, vá em **Ajustes do Sistema > Privacidade e Segurança** e clique em **Abrir Mesmo Assim**. Outra opção é remover a quarentena pelo terminal:
->
-> ```bash
-> xattr -dr com.apple.quarantine /Applications/DMBar.app
-> ```
+> O app ainda não é notarizado pela Apple, então o macOS pede uma confirmação na primeira abertura. Para liberar, vá em **Ajustes do Sistema > Privacidade e Segurança** e clique em **Abrir Mesmo Assim**.
 
 As releases são compiladas pelo GitHub Actions a cada tag `v*`, a partir deste repositório.
 
