@@ -1,73 +1,75 @@
 <div align="center">
 
-<img src="DMBar/Assets.xcassets/AppIcon.appiconset/icon_128x128@2x.png" alt="Ícone do DMBar" width="128">
+<img src="DMBar/Assets.xcassets/AppIcon.appiconset/icon_128x128@2x.png" alt="DMBar icon" width="128">
 
 # DMBar
 
-**Suas DMs do Instagram na barra de menu do macOS.**
+**Your Instagram DMs in the macOS menu bar.**
 
 ![macOS 13+](https://img.shields.io/badge/macOS-13%2B-black)
 ![Swift 5.9](https://img.shields.io/badge/Swift-5.9-orange)
-![Sem dependências](https://img.shields.io/badge/depend%C3%AAncias-nenhuma-lightgrey)
-![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-blue)
+![No dependencies](https://img.shields.io/badge/dependencies-none-lightgrey)
+![License MIT](https://img.shields.io/badge/license-MIT-blue)
 
-[Recursos](#recursos) • [Instalação](#instalação) • [Uso](#uso) • [Como funciona](#como-funciona) • [Limitações](#limitações)
+[Features](#features) • [Install](#install) • [Usage](#usage) • [How it works](#how-it-works) • [Limitations](#limitations)
+
+English • <a href="README.pt-BR.md">Português</a>
 
 </div>
 
-DMBar é um app nativo de barra de menu que mostra só as mensagens diretas do Instagram. Você lê e responde sem abrir o navegador e sem ver feed, stories ou reels.
+DMBar is a native menu bar app that shows only your Instagram direct messages. Read and reply without opening a browser and without seeing the feed, stories or reels.
 
-O app carrega a versão web oficial do Instagram num `WKWebView`. Ele não usa API privada do Instagram nem automatiza requisições.
+The app loads the official Instagram website in a `WKWebView`. It does not use any private Instagram API and does not automate requests.
 
 <p align="center">
-  <img src="docs/screenshots/inbox.png" alt="Lista de conversas no popover do DMBar" width="32%">
-  <img src="docs/screenshots/conversa.png" alt="Conversa aberta no DMBar" width="32%">
-  <img src="docs/screenshots/pedidos.png" alt="Pedidos de contato no DMBar" width="32%">
+  <img src="docs/screenshots/inbox.png" alt="Conversation list in the DMBar popover" width="32%">
+  <img src="docs/screenshots/conversa.png" alt="Open conversation in DMBar" width="32%">
+  <img src="docs/screenshots/pedidos.png" alt="Message requests in DMBar" width="32%">
 </p>
 
 > [!NOTE]
-> DMBar é um projeto independente. Ele não tem relação com o Instagram nem com a Meta.
+> DMBar is an independent project. It is not affiliated with Instagram or Meta.
 
-## Recursos
+## Features
 
-- **Só DMs:** lista de conversas e chat em um popover de 380x560, sem barra de navegação, feed ou Notas.
-- **Login persistente:** entre uma vez com usuário e senha ou com Facebook. O 2FA funciona dentro do app.
-- **Badge de não lidas:** o número de conversas não lidas aparece ao lado do ícone na barra de menu.
-- **Notificações nativas:** um aviso aparece quando chega mensagem com o popover fechado. Clicar no aviso abre o popover.
-- **Atalho global:** <kbd>⌥</kbd> <kbd>D</kbd> abre e fecha o DMBar de qualquer app.
-- **Abrir ao iniciar o Mac:** opção nas Preferências.
-- **Sem ícone no Dock:** o app vive só na barra de menu.
+- **DMs only:** conversation list and chat in a 380x560 popover, with no navigation bar, feed or Notes.
+- **Persistent login:** sign in once with username and password or with Facebook. Two-factor authentication works inside the app.
+- **Unread badge:** the number of unread conversations appears next to the menu bar icon.
+- **Native notifications:** you get a notification when a message arrives while the popover is closed. Click it to open the popover.
+- **Global shortcut:** <kbd>⌥</kbd> <kbd>D</kbd> opens and closes DMBar from any app.
+- **Launch at login:** option in Preferences.
+- **No Dock icon:** the app lives only in the menu bar.
 
-## Instalação
+## Install
 
-### Baixar a versão pronta
+### Download the prebuilt app
 
-1. Baixe o `DMBar.zip` da [última release](https://github.com/CarlosAllberto/dmbar/releases/latest).
-2. Descompacte e mova o `DMBar.app` para `/Applications`.
-3. Abra o app.
+1. Download `DMBar.zip` from the [latest release](https://github.com/CarlosAllberto/dmbar/releases/latest).
+2. Unzip it and move `DMBar.app` to `/Applications`.
+3. Open the app.
 
-> [!WARNING]
-> O app não é notarizado pela Apple, então o macOS bloqueia a primeira abertura. Para liberar, vá em **Ajustes do Sistema > Privacidade e Segurança** e clique em **Abrir Mesmo Assim**. Outra opção é remover a quarentena pelo terminal:
+> [!NOTE]
+> The app is not notarized by Apple yet, so macOS asks for confirmation the first time you open it. Go to **System Settings > Privacy & Security** and click **Open Anyway**. You can also remove the quarantine flag from the terminal:
 >
 > ```bash
 > xattr -dr com.apple.quarantine /Applications/DMBar.app
 > ```
 
-As releases são compiladas pelo GitHub Actions a cada tag `v*`, a partir deste repositório.
+Releases are built by GitHub Actions from this repository for every `v*` tag.
 
-### Compilar a partir do código
+### Build from source
 
-Requisitos:
+Requirements:
 
-- macOS 13 ou superior
-- Xcode 15 ou superior
+- macOS 13 or later
+- Xcode 15 or later
 - [XcodeGen](https://github.com/yonaskolb/XcodeGen)
 
 ```bash
 brew install xcodegen
 ```
 
-O projeto Xcode é gerado a partir do [`project.yml`](project.yml) e não fica no repositório.
+The Xcode project is generated from [`project.yml`](project.yml) and is not committed.
 
 ```bash
 git clone https://github.com/CarlosAllberto/dmbar.git
@@ -76,62 +78,65 @@ xcodegen generate
 xcodebuild -project DMBar.xcodeproj -scheme DMBar -configuration Release -derivedDataPath build build
 ```
 
-O app fica em `build/Build/Products/Release/DMBar.app`. Copie para `/Applications` e abra.
+The app is created at `build/Build/Products/Release/DMBar.app`. Copy it to `/Applications` and open it.
 
 > [!TIP]
-> Para desenvolver, abra `DMBar.xcodeproj` no Xcode e rode o esquema `DMBar`. Rode `xcodegen generate` de novo sempre que adicionar ou remover arquivos.
+> For development, open `DMBar.xcodeproj` in Xcode and run the `DMBar` scheme. Run `xcodegen generate` again whenever you add or remove files.
 
-> [!IMPORTANT]
-> O app é assinado ad-hoc (`CODE_SIGN_IDENTITY: "-"`) e serve para rodar na sua própria máquina. Para distribuir para outras pessoas, configure seu time em `project.yml` e faça a notarização.
+> [!NOTE]
+> The app is ad-hoc signed (`CODE_SIGN_IDENTITY: "-"`) to run on your own Mac. To distribute it, set your team in `project.yml` and notarize the app.
 
-## Uso
+## Usage
 
-| Ação | Como |
+| Action | How |
 | --- | --- |
-| Abrir ou fechar as DMs | Clique no ícone ou aperte <kbd>⌥</kbd> <kbd>D</kbd> |
-| Voltar para a lista | Seta `‹` no canto superior esquerdo |
-| Recarregar a página | Clique direito no ícone, **Atualizar** |
-| Abrir ao iniciar o Mac | Clique direito no ícone, **Preferências…** |
-| Sair da conta do Instagram | Clique direito no ícone, **Sair da conta…** |
-| Fechar o app | Clique direito no ícone, **Sair** |
+| Open or close your DMs | Click the icon or press <kbd>⌥</kbd> <kbd>D</kbd> |
+| Go back to the list | `‹` arrow in the top left corner |
+| Reload the page | Right-click the icon, **Atualizar** |
+| Launch at login | Right-click the icon, **Preferências…** |
+| Sign out of Instagram | Right-click the icon, **Sair da conta…** |
+| Quit the app | Right-click the icon, **Sair** |
 
-Na primeira abertura, faça login no popover e permita as notificações quando o macOS pedir.
+The first time, sign in inside the popover and allow notifications when macOS asks.
 
-## Como funciona
+> [!NOTE]
+> The app interface is in Portuguese for now. Instagram itself follows your account language.
+
+## How it works
 
 ```
 DMBar/
-├── App/        AppDelegate: ícone, popover, menu e badge
-├── UI/         Popover e janela de Preferências (SwiftUI)
-├── Web/        WKWebView compartilhado, CSS e JS injetados
-└── Services/   Notificações, atalho global (Carbon)
+├── App/        AppDelegate: icon, popover, menu and badge
+├── UI/         Popover and Preferences window (SwiftUI)
+├── Web/        Shared WKWebView, injected CSS and JS
+└── Services/   Notifications, global shortcut (Carbon)
 ```
 
-- **Um WebView sempre vivo.** O `WebViewHost` cria um único `WKWebView`. Quando o popover fecha, a view vai para uma janela oculta. Assim a página continua recebendo mensagens e atualizando o badge.
-- **CSS e JS injetados.** [`Scripts.swift`](DMBar/Web/Scripts.swift) esconde tudo que não é DM e ajusta o layout ao popover. Em 380px, a lista e a conversa aparecem uma por vez.
-- **Contador de não lidas.** O JS lê o número no título da página, no ícone de DMs e nas abas, e envia o maior valor ao Swift.
-- **Login com Facebook.** O Instagram precisa ler o cookie do `facebook.com`. Por isso o DMBar libera cookies de terceiros no seu próprio armazenamento. Safari e outros apps não mudam.
+- **One WebView that stays alive.** `WebViewHost` creates a single `WKWebView`. When the popover closes, the view moves to a hidden window, so the page keeps receiving messages and updating the badge.
+- **Injected CSS and JS.** [`Scripts.swift`](DMBar/Web/Scripts.swift) hides everything that is not a DM and fits the layout to the popover. At 380px, the list and the conversation show one at a time.
+- **Unread counter.** The script reads the number from the page title, the DM icon and the tabs, and sends the highest value to Swift.
+- **Facebook login.** Instagram needs to read the `facebook.com` cookie, so DMBar allows third-party cookies in its own data store. Safari and other apps are not affected.
 
-## Limitações
+## Limitations
 
-> [!WARNING]
-> O layout depende do HTML do Instagram, que muda sem aviso. Se o feed ou a barra de navegação voltarem a aparecer, revise os seletores em [`Scripts.swift`](DMBar/Web/Scripts.swift).
+> [!NOTE]
+> The layout depends on Instagram's HTML, which can change at any time. If the feed or the navigation bar shows up again, update the selectors in [`Scripts.swift`](DMBar/Web/Scripts.swift).
 
-- O badge conta **conversas** não lidas, não mensagens. É o mesmo número que o Instagram mostra.
-- As notificações dizem quantas conversas estão sem leitura, mas não mostram remetente nem texto.
-- Liberar cookies de terceiros usa uma interface interna do WebKit. Se a Apple removê-la, só o login com Facebook para de funcionar. Usuário e senha continuam funcionando.
-- O atalho é fixo em <kbd>⌥</kbd> <kbd>D</kbd>.
-- Uma conta por vez.
+- The badge counts unread **conversations**, not messages. It is the same number Instagram shows.
+- Notifications say how many conversations are unread, but do not show the sender or the text.
+- Allowing third-party cookies uses an internal WebKit interface. If Apple removes it, only Facebook login stops working. Username and password still work.
+- The shortcut is fixed to <kbd>⌥</kbd> <kbd>D</kbd>.
+- One account at a time.
 
-## Desenvolvimento
+## Development
 
-O build Debug tem ferramentas para ajustar o CSS:
+Debug builds include tools to adjust the CSS:
 
-- **Web Inspector:** o `WKWebView` pode ser inspecionado pelo menu Desenvolver do Safari.
-- **Captura e DOM:** a cada 3 segundos, o app salva `dmbar.png` e `dom.txt` em `~/Library/Containers/com.treendz.dmbar/Data/tmp/`.
-- **Copiar DOM:** o menu do ícone ganha **Debug: copiar DOM**.
-- **Abrir numa página:** a variável `DMBAR_URL` define a página inicial.
-- **Modo demo:** com `DMBAR_DEMO=1`, nomes, mensagens e fotos viram dados fictícios, com retratos do Unsplash. Foi assim que as imagens deste README foram feitas. As fotos seguem a [licença Unsplash](https://unsplash.com/license), não a licença MIT do projeto.
+- **Web Inspector:** inspect the `WKWebView` from Safari's Develop menu.
+- **Snapshot and DOM:** every 3 seconds the app saves `dmbar.png` and `dom.txt` to `~/Library/Containers/com.treendz.dmbar/Data/tmp/`.
+- **Copy DOM:** the icon menu gets a **Debug: copiar DOM** item.
+- **Start page:** the `DMBAR_URL` variable sets the first page to load.
+- **Demo mode:** with `DMBAR_DEMO=1`, names, messages and photos are replaced with fake data and Unsplash portraits. The screenshots in this README were made this way. The photos follow the [Unsplash license](https://unsplash.com/license), not the project's MIT license.
 
 ```bash
 DMBAR_URL=https://www.instagram.com/direct/requests/ build/Build/Products/Debug/DMBar.app/Contents/MacOS/DMBar
