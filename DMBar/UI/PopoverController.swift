@@ -24,5 +24,6 @@ final class PopoverController: NSViewController {
     override func viewDidDisappear() {
         super.viewDidDisappear()
         WebViewHost.shared.park()
+        WebViewHost.shared.showInbox()
     }
 }

@@ -93,6 +93,25 @@ final class WebViewHost: NSObject, WKNavigationDelegate, WKUIDelegate, WKScriptM
         hiddenWindow.orderFrontRegardless()
     }
 
+    /// Volta para a aba Principal da lista. Feito ao fechar, para o popover não reabrir no chat antigo nem em Geral.
+    func showInbox() {
+        webView.evaluateJavaScript("""
+        (() => {
+          const primary = () => {
+            const tab = [...document.querySelectorAll('main [role="tab"]')].find(t => /^(Primary|Principal)/i.test(t.textContent.trim()));
+            if (tab && tab.getAttribute('aria-selected') !== 'true') tab.click();
+          };
+          if (location.pathname.startsWith('/direct/t/') || location.pathname.startsWith('/direct/requests')) {
+            const link = document.querySelector('a[href="/direct/inbox/"]');
+            link ? link.click() : location.assign('/direct/inbox/');
+            setTimeout(primary, 1000);  // as abas só existem depois que a lista renderiza
+          } else if (location.pathname.startsWith('/direct/')) {
+            primary();
+          }
+        })()
+        """)
+    }
+
     #if DEBUG
     func copyDOMOutline() {
         domOutline { text in
