@@ -20,15 +20,17 @@ DMBar: app de barra de menus do macOS (Swift, sem dependências) que mostra só 
 
 ## Lista de tarefas
 
-O arquivo TASKS.md na raiz tem o backlog do projeto (Agora, Próximo, Ideias, Feito) e uma seção "Em execução" para o checklist da tarefa atual.
+O backlog fica no Linear: workspace "Carlos Alberto", time `CAR`, projeto `DMBar` (use `orca linear`, skill `orca-linear`). Toda issue deste repositório entra no projeto `DMBar`, nunca solta no time, para não misturar com outros projetos. Tipo pela label (`Feature`, `Improvement`, `Bug`). Estados: Backlog = ideia, Todo = próximo, In Progress = agora, Done = feito.
+
+O checklist da tarefa atual fica na descrição da própria issue, numa seção `## Etapas` com itens `- [ ]`. Atualize a descrição com `orca linear save-issue CAR-<n> --body-file -` (a descrição é substituída inteira: leia antes com `orca linear issue CAR-<n> --full --json` e preserve o resto).
 
 Em tarefas com várias etapas:
-- Antes de começar, liste as etapas em "Em execução".
+- Antes de começar, crie ou ache a issue, escreva as etapas em `## Etapas` e passe a issue para In Progress.
 - Marque cada item assim que terminar e acrescente o que descobrir no caminho.
-- Se a conversa for resumida ou você perder o fio, leia o TASKS.md antes de continuar.
-- Ao concluir, mova o item de "Agora" para "Feito" e limpe "Em execução".
-- Trabalho novo fora do escopo entra em "Próximo", sem ser resolvido na hora.
-- Nunca apague itens sem eu pedir.
+- Se a conversa for resumida ou você perder o fio, releia a issue In Progress antes de continuar.
+- Ao concluir, passe a issue para Done.
+- Trabalho novo fora do escopo vira issue nova em Todo no projeto `DMBar`, sem ser resolvido na hora.
+- Nunca apague nem cancele issues sem eu pedir.
 - Antes de dizer que terminou, rode build e testes e informe o resultado.
 
 Tarefa de um passo só não precisa de checklist.
