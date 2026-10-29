@@ -101,7 +101,13 @@ final class WebViewHost: NSObject, WKNavigationDelegate, WKUIDelegate, WKScriptM
             const tab = [...document.querySelectorAll('main [role="tab"]')].find(t => /^(Primary|Principal)/i.test(t.textContent.trim()));
             if (tab && tab.getAttribute('aria-selected') !== 'true') tab.click();
           };
-          if (location.pathname.startsWith('/direct/t/') || location.pathname.startsWith('/direct/requests')) {
+          // lista explícita: login, 2FA e desafio nunca entram aqui
+          const media = /^\\/(p|reels?|tv|stories)\\//.test(location.pathname) ||
+            (location.pathname.startsWith('/direct/') && document.querySelector('div[role="dialog"] article, div[role="dialog"] video'));
+          // Com vídeo ou post aberto, a navegação sem recarregar deixava a lista em branco; recarregar também para o som.
+          if (media) {
+            location.assign('/direct/inbox/');
+          } else if (location.pathname.startsWith('/direct/t/') || location.pathname.startsWith('/direct/requests')) {
             const link = document.querySelector('a[href="/direct/inbox/"]');
             link ? link.click() : location.assign('/direct/inbox/');
             setTimeout(primary, 1000);  // as abas só existem depois que a lista renderiza
