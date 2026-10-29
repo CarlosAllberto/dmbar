@@ -32,6 +32,12 @@ enum Scripts {
     /* Faixa para a seta não cobrir o primeiro item dos Pedidos. */
     html[data-dmbar-back] main div[role="navigation"] > div { padding-top: 44px !important; box-sizing: border-box !important; }
 
+    /* Post de foto compartilhado no chat: cabeçalho (59px) fora do botão, foto (397px) e legenda (67px) dentro dele.
+       O card ia a 523px; a foto passa a 230px para o card ter os 356px do card de vídeo, preenchendo o espaço como o vídeo. */
+    main div[role="article"] div:not([role]) + div[role="button"] > div:first-child { height: 230px !important; }
+    main div[role="article"] div:not([role]) + div[role="button"] > div:first-child div:has(img) { height: 100% !important; padding: 0 !important; }
+    main div[role="article"] div:not([role]) + div[role="button"] > div:first-child img { width: 100% !important; height: 100% !important; object-fit: cover !important; }
+
     /* Sem fundo de hover nas conversas. Vale só para div: o ponto verde de online é span e mantém a cor. */
     main div[role="navigation"] div:hover { background-color: transparent !important; }
 
@@ -49,13 +55,19 @@ enum Scripts {
     /* Modal colado no topo e no fim do popover, sem a faixa vazia em cima e embaixo. */
     div[role="dialog"] { height: 100vh !important; max-height: none !important; margin: 0 !important; }
     div[role="dialog"] div:has(article), div[role="dialog"] article, div[role="dialog"] article > div { height: 100% !important; max-height: none !important; }
+    /* Nome longo (ou "fulano e beltrano" em collab) quebrava letra por letra: fica numa linha só, cortado com reticências. */
+    div[role="dialog"] header div { min-width: 0 !important; }
+    div[role="dialog"] header :is(div, span) { white-space: nowrap !important; word-break: normal !important; overflow-wrap: normal !important; }
+    /* Só nos blocos de texto: na foto, o overflow cortava o anel de stories (canvas maior que a foto). */
+    div[role="dialog"] header :is(div, span):not(:has(div, canvas, img)) { overflow: hidden !important; text-overflow: ellipsis !important; }
     /* Menu "..." do post sai: o X de fechar do Instagram fica no lugar dele, no canto do cabeçalho. */
     div[role="dialog"] header + div { visibility: hidden !important; }
     /* A mídia ocupa o que sobra entre cabeçalho e ações. Antes ficava em 262px e o vídeo vazava por baixo das ações. */
     div[role="dialog"] article > div > div:nth-child(2) { flex: 1 1 0 !important; min-height: 0 !important; height: auto !important; max-height: none !important; overflow: hidden !important; }
-    /* Só os divs que contêm o vídeo: o Instagram usa padding de proporção neles; os controles ficam de fora. */
-    div[role="dialog"] article > div > div:nth-child(2) div:has(video) { height: 100% !important; padding: 0 !important; }
-    div[role="dialog"] article > div > div:nth-child(2) video { width: 100% !important; height: 100% !important; object-fit: contain !important; }
+    /* Só os divs que contêm o vídeo ou a foto: o Instagram usa padding de proporção neles; os controles ficam de fora. */
+    /* contain mostra a mídia inteira; a foto vinha com cover e cortava as bordas. */
+    div[role="dialog"] article > div > div:nth-child(2) div:has(video, img) { height: 100% !important; padding: 0 !important; }
+    div[role="dialog"] article > div > div:nth-child(2) :is(video, img) { width: 100% !important; height: 100% !important; object-fit: contain !important; }
 
     /* Barra de rolagem da página ocupava 17px à direita; o scroll por trackpad continua. */
     ::-webkit-scrollbar { width: 0 !important; height: 0 !important; }
