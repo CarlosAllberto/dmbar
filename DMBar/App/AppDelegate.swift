@@ -1,9 +1,9 @@
 import AppKit
+import ServiceManagement
 
 final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private var statusItem: NSStatusItem!
     private let popover = NSPopover()
-    private var preferences: PreferencesWindow?
     private let notifications = NotificationService()
     private var lastUnread = 0
     private var hotKey: HotKeyService?
@@ -74,8 +74,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
 
     private func showMenu() {
         let menu = NSMenu()
-        menu.addItem(withTitle: "Atualizar", action: #selector(reload), keyEquivalent: "").target = self
-        menu.addItem(withTitle: "Preferências…", action: #selector(showPreferences), keyEquivalent: ",").target = self
+        // O ⌥D à direita só mostra o atalho global; quem responde à tecla é o HotKeyService.
+        let open = menu.addItem(withTitle: "Abrir DMBar", action: #selector(openPopover), keyEquivalent: "d")
+        open.keyEquivalentModifierMask = .option
+        open.target = self
+        menu.addItem(withTitle: "Recarregar", action: #selector(reload), keyEquivalent: "").target = self
+        let launch = menu.addItem(withTitle: "Abrir ao iniciar o Mac", action: #selector(toggleLaunchAtLogin), keyEquivalent: "")
+        launch.target = self
+        launch.state = SMAppService.mainApp.status == .enabled ? .on : .off
         #if DEBUG
         menu.addItem(withTitle: "Debug: copiar DOM", action: #selector(copyDOM), keyEquivalent: "").target = self
         #endif
@@ -86,6 +92,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         statusItem.menu = menu
         statusItem.button?.performClick(nil)
         statusItem.menu = nil
+    }
+
+    @objc private func openPopover() {
+        // Abre depois que o menu fecha, para o popover não disputar o botão com ele.
+        DispatchQueue.main.async { self.showPopover() }
     }
 
     @objc private func reload() {
@@ -110,8 +121,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         }
     }
 
-    @objc private func showPreferences() {
-        if preferences == nil { preferences = PreferencesWindow() }
-        preferences?.show()
+    @objc private func toggleLaunchAtLogin() {
+        do {
+            if SMAppService.mainApp.status == .enabled {
+                try SMAppService.mainApp.unregister()
+            } else {
+                try SMAppService.mainApp.register()
+            }
+        } catch {
+            let alert = NSAlert(error: error)
+            NSApp.activate(ignoringOtherApps: true)
+            alert.runModal()
+        }
     }
 }

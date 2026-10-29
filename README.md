@@ -37,7 +37,7 @@ The app loads the official Instagram website in a `WKWebView`. It does not use a
 - **Unread badge:** the number of unread conversations appears next to the menu bar icon.
 - **Native notifications:** you get a notification when a message arrives while the popover is closed. Click it to open the popover.
 - **Global shortcut:** <kbd>⌥</kbd> <kbd>D</kbd> opens and closes DMBar from any app.
-- **Launch at login:** option in Preferences.
+- **Launch at login:** option in the icon menu.
 - **No Dock icon:** the app lives only in the menu bar.
 
 ## Install
@@ -88,8 +88,8 @@ The app is created at `build/Build/Products/Release/DMBar.app`. Copy it to `/App
 | --- | --- |
 | Open or close your DMs | Click the icon or press <kbd>⌥</kbd> <kbd>D</kbd> |
 | Go back to the list | `‹` arrow in the top left corner |
-| Reload the page | Right-click the icon, **Atualizar** |
-| Launch at login | Right-click the icon, **Preferências…** |
+| Reload the page | Right-click the icon, **Recarregar** |
+| Launch at login | Right-click the icon, **Abrir ao iniciar o Mac** |
 | Sign out of Instagram | Right-click the icon, **Sair da conta…** |
 | Quit the app | Right-click the icon, **Sair** |
 
@@ -103,7 +103,7 @@ The first time, sign in inside the popover and allow notifications when macOS as
 ```
 DMBar/
 ├── App/        AppDelegate: icon, popover, menu and badge
-├── UI/         Popover and Preferences window (SwiftUI)
+├── UI/         Popover
 ├── Web/        Shared WKWebView, injected CSS and JS
 └── Services/   Notifications, global shortcut (Carbon)
 ```

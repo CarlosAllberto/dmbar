@@ -37,7 +37,7 @@ O app carrega a versão web oficial do Instagram num `WKWebView`. Ele não usa A
 - **Badge de não lidas:** o número de conversas não lidas aparece ao lado do ícone na barra de menu.
 - **Notificações nativas:** um aviso aparece quando chega mensagem com o popover fechado. Clicar no aviso abre o popover.
 - **Atalho global:** <kbd>⌥</kbd> <kbd>D</kbd> abre e fecha o DMBar de qualquer app.
-- **Abrir ao iniciar o Mac:** opção nas Preferências.
+- **Abrir ao iniciar o Mac:** opção no menu do ícone.
 - **Sem ícone no Dock:** o app vive só na barra de menu.
 
 ## Instalação
@@ -88,8 +88,8 @@ O app fica em `build/Build/Products/Release/DMBar.app`. Copie para `/Application
 | --- | --- |
 | Abrir ou fechar as DMs | Clique no ícone ou aperte <kbd>⌥</kbd> <kbd>D</kbd> |
 | Voltar para a lista | Seta `‹` no canto superior esquerdo |
-| Recarregar a página | Clique direito no ícone, **Atualizar** |
-| Abrir ao iniciar o Mac | Clique direito no ícone, **Preferências…** |
+| Recarregar a página | Clique direito no ícone, **Recarregar** |
+| Abrir ao iniciar o Mac | Clique direito no ícone, **Abrir ao iniciar o Mac** |
 | Sair da conta do Instagram | Clique direito no ícone, **Sair da conta…** |
 | Fechar o app | Clique direito no ícone, **Sair** |
 
@@ -100,7 +100,7 @@ Na primeira abertura, faça login no popover e permita as notificações quando 
 ```
 DMBar/
 ├── App/        AppDelegate: ícone, popover, menu e badge
-├── UI/         Popover e janela de Preferências (SwiftUI)
+├── UI/         Popover
 ├── Web/        WKWebView compartilhado, CSS e JS injetados
 └── Services/   Notificações, atalho global (Carbon)
 ```
